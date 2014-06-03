@@ -242,141 +242,142 @@ class mdxyz():
                 
                 
             
-        
+####
+if __name__ == '__main__':        
             
 
-# points = [[1.,4.,5.],[4.,4.,2.],[2.,-4.,1.],[-5,-5.,0.]]
-# gplane = [0,0,2,0]
-# print len(points)
+    # points = [[1.,4.,5.],[4.,4.,2.],[2.,-4.,1.],[-5,-5.,0.]]
+    # gplane = [0,0,2,0]
+    # print len(points)
 
-# plane = meanPlane(points,gplane)
-# final = plane.optimize_plane()
-# print final
-# plane.show_graph()
+    # plane = meanPlane(points,gplane)
+    # final = plane.optimize_plane()
+    # print final
+    # plane.show_graph()
 
-system = '4T-4mon'
-
-
-if system == '4T-4mon':
-    ## 4T-4mon
-    xyz = mdxyz('./asd.xyz')
-
-    xyz.read_xyz()
-    dihed         = []
-    c_alpha       = []
-    c_alphavcore1 = []
-    c_alphavcore2 = []
-    pipi_dist     = []
-    c_alphavpept  = []
-    for f in xrange(0,xyz.frames):
-    #    dihed.append(xyz.atoms_died(197,171,337,363,frame=f))
-#        dihed.append(xyz.atoms_died(533,507,337,353,frame=f))
-#        dihed.append(xyz.atoms_died(533,507,337,353,frame=f))
-        dihed.append(xyz.atoms_died(507,533,363,337,frame=f))
-        c_alphavpept.append(xyz.atoms_angle(206,372,427,frame=f))
-        c_alpha.append(xyz.atoms_distance(372,206,frame=f))
-        c_alpha.append(xyz.atoms_distance(383,217,frame=f))
-        c_alphavcore1.append(xyz.atoms_angle_4(383,217,197,171,frame=f))
-        c_alphavcore2.append(xyz.atoms_angle_4(363,337,372,206,frame=f))
-        #pipi
-        plane = meanPlane(xyz.atom_xyz('171-197',frame=f),[1,1,1,1])
-        other_core = xyz.atom_xyz('337-363',frame=f)
-        plane.other_points = other_core
-        centroid = xyz.atoms_centroid('337-363',frame=f)
-        final = plane.optimize_plane()
-        pipi_dist.append(plane.point_from_plane(centroid))
-
-    c_alpha       = np.array(c_alpha)
-    pipi_dist     = np.array(pipi_dist)
-    dihed         = np.array(dihed)
-    c_alphavcore1 = np.array(c_alphavcore1)
-    c_alphavcore2 = np.array(c_alphavcore2)
-    c_alphavpept  = np.array(c_alphavpept)
-    
+    system = '4T-4mon'
 
 
+    if system == '4T-4mon':
+        ## 4T-4mon
+        xyz = mdxyz('./asd.xyz')
 
-if system == '4T-6mon':
-    ## 4T-4mon
-    xyz = mdxyz('./asd.xyz')
+        xyz.read_xyz()
+        dihed         = []
+        c_alpha       = []
+        c_alphavcore1 = []
+        c_alphavcore2 = []
+        pipi_dist     = []
+        c_alphavpept  = []
+        for f in xrange(0,xyz.frames):
+        #    dihed.append(xyz.atoms_died(197,171,337,363,frame=f))
+    #        dihed.append(xyz.atoms_died(533,507,337,353,frame=f))
+    #        dihed.append(xyz.atoms_died(533,507,337,353,frame=f))
+            dihed.append(xyz.atoms_died(507,533,363,337,frame=f))
+            c_alphavpept.append(xyz.atoms_angle(206,372,427,frame=f))
+            c_alpha.append(xyz.atoms_distance(372,206,frame=f))
+            c_alpha.append(xyz.atoms_distance(383,217,frame=f))
+            c_alphavcore1.append(xyz.atoms_angle_4(383,217,197,171,frame=f))
+            c_alphavcore2.append(xyz.atoms_angle_4(363,337,372,206,frame=f))
+            #pipi
+            plane = meanPlane(xyz.atom_xyz('171-197',frame=f),[1,1,1,1])
+            other_core = xyz.atom_xyz('337-363',frame=f)
+            plane.other_points = other_core
+            centroid = xyz.atoms_centroid('337-363',frame=f)
+            final = plane.optimize_plane()
+            pipi_dist.append(plane.point_from_plane(centroid))
 
-    xyz.read_xyz()
-    dihed         = []
-    c_alpha       = []
-    c_alphavcore1 = []
-    c_alphavcore2 = []
-    pipi_dist     = []
-    c_alphavpept  = []
-    for f in xrange(80,xyz.frames):
-    #    dihed.append(xyz.atoms_died(197,171,337,363,frame=f))
-        dihed.append(xyz.atoms_died(507,533,367,341,frame=f))
-    #    dihed.append(xyz.atoms_died(507,533,363,337,frame=f))
-        c_alphavpept.append(xyz.atoms_angle(387,553,567,frame=f))
-        c_alpha.append(xyz.atoms_distance(387,553,frame=f))
-        c_alpha.append(xyz.atoms_distance(376,542,frame=f))
-        c_alphavcore1.append(xyz.atoms_angle_4(341,367,387,401,frame=f))
-        c_alphavcore2.append(xyz.atoms_angle_4(533,507,542,597,frame=f))
-        #pipi
-        plane = meanPlane(xyz.atom_xyz('341-368',frame=f),[1,1,1,1])
-#        other_core = xyz.atom_xyz('534-507',frame=f)
-#        plane.other_points = other_core
-        centroid = xyz.atoms_centroid('507-534',frame=f)
-        final = plane.optimize_plane()
-        pipi_dist.append(plane.point_from_plane(centroid))
-
-    c_alpha       = np.array(c_alpha)
-    pipi_dist     = np.array(pipi_dist)
-    dihed         = np.array(dihed)
-    c_alphavcore1 = np.array(c_alphavcore1)
-    c_alphavcore2 = np.array(c_alphavcore2)
-    c_alphavpept  = np.array(c_alphavpept)
+        c_alpha       = np.array(c_alpha)
+        pipi_dist     = np.array(pipi_dist)
+        dihed         = np.array(dihed)
+        c_alphavcore1 = np.array(c_alphavcore1)
+        c_alphavcore2 = np.array(c_alphavcore2)
+        c_alphavpept  = np.array(c_alphavpept)
 
 
 
 
-if system == '4T-4mon-PM6D3':
-    ## 4T-4mon
-    xyz = mdxyz('./asd.xyz')
+    if system == '4T-6mon':
+        ## 4T-4mon
+        xyz = mdxyz('./asd.xyz')
 
-    xyz.read_xyz()
-    dihed         = []
-    c_alpha       = []
-    c_alphavcore1 = []
-    c_alphavcore2 = []
-    pipi_dist     = []
-    c_alphavpept  = []
-    for f in xrange(80,xyz.frames):
-    #    dihed.append(xyz.atoms_died(197,171,337,363,frame=f))
-        dihed.append(xyz.atoms_died(507,533,367,341,frame=f))
-    #    dihed.append(xyz.atoms_died(507,533,363,337,frame=f))
-        c_alphavpept.append(xyz.atoms_angle(387,553,567,frame=f))
-        c_alpha.append(xyz.atoms_distance(387,553,frame=f))
-        c_alpha.append(xyz.atoms_distance(376,542,frame=f))
-        c_alphavcore1.append(xyz.atoms_angle_4(341,367,387,401,frame=f))
-        c_alphavcore2.append(xyz.atoms_angle_4(533,507,542,597,frame=f))
-        #pipi
-        plane = meanPlane(xyz.atom_xyz('341-368',frame=f),[1,1,1,1])
-#        other_core = xyz.atom_xyz('534-507',frame=f)
-#        plane.other_points = other_core
-        centroid = xyz.atoms_centroid('507-534',frame=f)
-        final = plane.optimize_plane()
-        pipi_dist.append(plane.point_from_plane(centroid))
+        xyz.read_xyz()
+        dihed         = []
+        c_alpha       = []
+        c_alphavcore1 = []
+        c_alphavcore2 = []
+        pipi_dist     = []
+        c_alphavpept  = []
+        for f in xrange(80,xyz.frames):
+        #    dihed.append(xyz.atoms_died(197,171,337,363,frame=f))
+            dihed.append(xyz.atoms_died(507,533,367,341,frame=f))
+        #    dihed.append(xyz.atoms_died(507,533,363,337,frame=f))
+            c_alphavpept.append(xyz.atoms_angle(387,553,567,frame=f))
+            c_alpha.append(xyz.atoms_distance(387,553,frame=f))
+            c_alpha.append(xyz.atoms_distance(376,542,frame=f))
+            c_alphavcore1.append(xyz.atoms_angle_4(341,367,387,401,frame=f))
+            c_alphavcore2.append(xyz.atoms_angle_4(533,507,542,597,frame=f))
+            #pipi
+            plane = meanPlane(xyz.atom_xyz('341-368',frame=f),[1,1,1,1])
+    #        other_core = xyz.atom_xyz('534-507',frame=f)
+    #        plane.other_points = other_core
+            centroid = xyz.atoms_centroid('507-534',frame=f)
+            final = plane.optimize_plane()
+            pipi_dist.append(plane.point_from_plane(centroid))
 
-    c_alpha       = np.array(c_alpha)
-    pipi_dist     = np.array(pipi_dist)
-    dihed         = np.array(dihed)
-    c_alphavcore1 = np.array(c_alphavcore1)
-    c_alphavcore2 = np.array(c_alphavcore2)
-    c_alphavpept  = np.array(c_alphavpept)
+        c_alpha       = np.array(c_alpha)
+        pipi_dist     = np.array(pipi_dist)
+        dihed         = np.array(dihed)
+        c_alphavcore1 = np.array(c_alphavcore1)
+        c_alphavcore2 = np.array(c_alphavcore2)
+        c_alphavpept  = np.array(c_alphavpept)
 
 
 
-print xyz.frames
-print 'c_alpha dist: ',np.average(c_alpha),' +-',np.std(c_alpha)
-print 'pipi dist: ',np.average(pipi_dist),' +-',np.std(pipi_dist)
-print 'c_alpha ^ core: ', 180 - np.average(np.concatenate((c_alphavcore1,c_alphavcore2))),' +-',np.std(np.concatenate((c_alphavcore1,c_alphavcore2)))
-print 'dihed: ',np.average(dihed),' +-',np.std(dihed)
-print 'c_alpha ^ pept: ',np.average(c_alphavpept),' +-',np.std(c_alphavpept)
+
+    if system == '4T-4mon-PM6D3':
+        ## 4T-4mon
+        xyz = mdxyz('./asd.xyz')
+
+        xyz.read_xyz()
+        dihed         = []
+        c_alpha       = []
+        c_alphavcore1 = []
+        c_alphavcore2 = []
+        pipi_dist     = []
+        c_alphavpept  = []
+        for f in xrange(80,xyz.frames):
+        #    dihed.append(xyz.atoms_died(197,171,337,363,frame=f))
+            dihed.append(xyz.atoms_died(507,533,367,341,frame=f))
+        #    dihed.append(xyz.atoms_died(507,533,363,337,frame=f))
+            c_alphavpept.append(xyz.atoms_angle(387,553,567,frame=f))
+            c_alpha.append(xyz.atoms_distance(387,553,frame=f))
+            c_alpha.append(xyz.atoms_distance(376,542,frame=f))
+            c_alphavcore1.append(xyz.atoms_angle_4(341,367,387,401,frame=f))
+            c_alphavcore2.append(xyz.atoms_angle_4(533,507,542,597,frame=f))
+            #pipi
+            plane = meanPlane(xyz.atom_xyz('341-368',frame=f),[1,1,1,1])
+    #        other_core = xyz.atom_xyz('534-507',frame=f)
+    #        plane.other_points = other_core
+            centroid = xyz.atoms_centroid('507-534',frame=f)
+            final = plane.optimize_plane()
+            pipi_dist.append(plane.point_from_plane(centroid))
+
+        c_alpha       = np.array(c_alpha)
+        pipi_dist     = np.array(pipi_dist)
+        dihed         = np.array(dihed)
+        c_alphavcore1 = np.array(c_alphavcore1)
+        c_alphavcore2 = np.array(c_alphavcore2)
+        c_alphavpept  = np.array(c_alphavpept)
+
+
+
+    print xyz.frames
+    print 'c_alpha dist: ',np.average(c_alpha),' +-',np.std(c_alpha)
+    print 'pipi dist: ',np.average(pipi_dist),' +-',np.std(pipi_dist)
+    print 'c_alpha ^ core: ', 180 - np.average(np.concatenate((c_alphavcore1,c_alphavcore2))),' +-',np.std(np.concatenate((c_alphavcore1,c_alphavcore2)))
+    print 'dihed: ',np.average(dihed),' +-',np.std(dihed)
+    print 'c_alpha ^ pept: ',np.average(c_alphavpept),' +-',np.std(c_alphavpept)
 
 
 
