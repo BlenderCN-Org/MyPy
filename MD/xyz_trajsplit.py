@@ -68,6 +68,7 @@ class mdxyz():
         self.filepath = filepath
         self.readed = False
         self.pi = np.arccos(-1.0)
+        self.read_xyz()
         
     def read_xyz(self):
         import re
@@ -89,7 +90,41 @@ class mdxyz():
                     self.at_xyz.append(map(float,line.split()[1:4]))
                     continue
             
-                    
+    def add_atom(self,at_type,at_xyz):
+        import re
+        match = re.match('^[a-zA-Z][a-zA-Z]$',at_type)
+        
+        if type(at_type) != str or type(at_xyz) != list:
+            print type(at_type),type(at_xyz)
+            print "The atom type has to be a string and the atom coordinates has to be a list"
+            import sys
+            sys.exit()
+
+        # for n in at_xyz:
+        #     if type(n) != float:
+        #         print "The atom coordinates have to be float!"
+        #         import sys
+        #         sys.exit()
+                
+
+        if not match:
+            print "The atom type has to be of two letters"
+            import sys
+            sys.exit()
+        
+        self.at_type.insert(0,at_type)
+
+        for i in xrange(self.frames):
+            try:
+                xyz = at_xyz(i)
+            except:
+                xyz = at_xyz[-1]
+
+            self.at_xyz.insert((i*self.natom)+i,xyz)
+
+        self.natom += 1
+        
+
     def frame(self,n):
         """Return a list of all the atoms and position for a specified frame"""
         fr = []
@@ -158,13 +193,21 @@ class mdxyz():
 
     def write_xyz(self,n,filepath,frame=1,append=True):
         
+        import MyPy.DATA.atomdata
+        atdata = MyPy.DATA.atomdata.atomdata()
+
         op_mode = 'a'
         if not append: op_mode = 'w'
         atoms = self.atom(n,frame=frame)
-        print atoms
+#        print atoms
         with open(filepath,op_mode) as fxyz:
             fxyz.write(' %10i \n\n' % len(atoms))
             for at in atoms:
+                try:
+                    int(at[0])
+                    at[0] = atdata.atnum_r[int(at[0])]
+                except:
+                    pass
                 fxyz.write('%4s   %12.6f  %12.6f  %12.6f\n' % (at[0],at[1][0],at[1][1],at[1][2]))
 
     def atoms_centroid(self,n,frame=1):
@@ -173,6 +216,21 @@ class mdxyz():
         
         natoms = len(xyz)
         return np.sum(np.transpose(np.array(xyz)),axis=1)/natoms
+
+
+    def atoms_baricenter(self,n,frame=1):
+        from MyPy.DATA.atomdata import atomdata
+        data = atomdata()
+
+        xyz = self.atom_xyz(n,frame=frame)
+        at_weight = map(lambda x: data.get_weight(x),self.atom_type(n))
+#        print np.array(at_weight).T
+#        print np.array(xyz).T
+#        print np.array(at_weight) * np.array(xyz).T
+
+        baricenter = np.sum(np.array(at_weight) * np.array(xyz).T,axis=1)/np.sum(np.array(at_weight))
+        
+        return baricenter
 
 
     def atoms_distance(self,a1,a2,frame=1):
@@ -245,6 +303,15 @@ class mdxyz():
 ####
 if __name__ == '__main__':        
             
+
+    import sys
+    
+    xyz = mdxyz('asd.xyz')
+    xyz.read_xyz()
+    print xyz.atom('0',frame=1)
+
+    exit()
+
 
     # points = [[1.,4.,5.],[4.,4.,2.],[2.,-4.,1.],[-5,-5.,0.]]
     # gplane = [0,0,2,0]
