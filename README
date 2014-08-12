@@ -1,0 +1,11 @@
+This is a bunch of classes that can also be used as standalone and are
+useful to run computation using ASE. They provide some standard computations:
+- Single Point
+- Geometry Optimization
+- MD (with and without Thermostat)
+
+The implemented methods are:
+- DFTB
+- DFTB+dDMC
+- DFTB+D3
+- DFTB+D3H4
