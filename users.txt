@@ -1,1 +1,0 @@
-petragli = Riccardo Petraglia <riccardo.petraglia@epfl.ch>
