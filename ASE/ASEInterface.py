@@ -490,7 +490,7 @@ class ASEInterface():
 
 
 if __name__ == '__main__':
-    #    print 'Executing tests on ASEInterface'
+
     asd = ASEInterface()
     
     asd.setMachine('workstation')
