@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import numpy as np
+import os
 
 class meanPlane:
     
@@ -176,7 +177,6 @@ class mdxyz():
         at_list = n.split(',')
         
         for elem in at_list:
-            
             start_id, end_id = self._checklist(elem)
             atoms += self.at_type[start_id:end_id]
 
@@ -197,7 +197,7 @@ class mdxyz():
         atdata = MyPy.DATA.atomdata.atomdata()
 
         op_mode = 'a'
-        if not append: op_mode = 'w'
+        if not append or not os.path.exists(filepath): op_mode = 'w'
         atoms = self.atom(n,frame=frame)
 #        print atoms
         with open(filepath,op_mode) as fxyz:

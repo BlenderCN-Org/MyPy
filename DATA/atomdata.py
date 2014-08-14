@@ -1,3 +1,5 @@
+from MyPy.ERRORS.errors_handling import *
+
 class atomdata():
 
     def __init__(self):
@@ -28,5 +30,11 @@ class atomdata():
         except:
             return self.weight[atom.lower()]
 
+    def transform_at_numb(self,atom):
+        try:
+            return self.atnum_r[atom]
+        except:
+            raise ImplementationError(atom,'Not found in atomdata.py')
+            
             
             
