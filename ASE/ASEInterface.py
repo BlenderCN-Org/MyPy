@@ -48,7 +48,7 @@ class ASEInterface():
         methods = ['dftb_std', 'dftb_std-D3', 'dftb_std-dDMC', 'dftb_std-D3H4']
 
         # Check if file exists and if method is a valid method
-        if not method in methods:
+        if  method not in methods:
             raise InputError(method,'The chosen method does not exist!')
         check.iffile(initial_structure)
         check.ifdir(workdir)

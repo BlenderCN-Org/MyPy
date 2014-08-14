@@ -11,7 +11,6 @@ def main():
     import sys
     from MyPy.ASE.ASEInterface import ASEInterface
     args = __parser()
-    print args
 
     ase = ASEInterface(job='geomOpt')
     ase.setMachine(__setHostname())
@@ -20,7 +19,8 @@ def main():
     ase.setGeomOptParams(args.out_prefix, fmax = args.fmax)
 
     outf = open(args.out_prefix+'.out','w',1)
-    outf.write(ase.runJob())
+    outf.write(ase.getParams())
+    ase.runJob()
 
 
 
@@ -40,7 +40,6 @@ def __parser():
                                      description='Perform geometry optimizations.')
     parser.add_argument('-m', '--method',
                         action = 'store',
-                        nargs = 1,
                         dest='method',
                         type=str,
                         default='dftb_std',
@@ -50,7 +49,6 @@ def __parser():
 
     parser.add_argument('-c', '--charge',
                         action='store', # optional because action defaults to 'store'
-                        nargs = 1,
                         dest='charge',
                         type=int,
                         metavar='CHARGE',
@@ -59,7 +57,6 @@ def __parser():
                         
     parser.add_argument('-s', '--spinm',
                         action = 'store',
-                        nargs = 1,
                         dest = 'spinm',
                         type = int,
                         metavar = 'SPINMULT',
@@ -68,16 +65,14 @@ def __parser():
     
     parser.add_argument('-o','--out-prefix',
                         action = 'store',
-                        nargs = 1,
                         dest = 'out_prefix',
                         type = str,
                         metavar = '<STRING>',
-                        default = 'geom_opt_',
-                        help = 'prefix of the output files (default: geom_opt_)')
+                        default = 'geom_opt',
+                        help = 'prefix of the output files (default: geom_opt)')
 
     parser.add_argument('-t','--fmax',
                         action = 'store',
-                        nargs = 1,
                         dest = 'fmax',
                         type = float,
                         metavar = 'FMAX',
@@ -86,8 +81,6 @@ def __parser():
 
     parser.add_argument('xyzfile',
                         action = 'store',
-#                        nargs = 1,
-#                        dest = 'xyzfile',
                         type = str,
                         metavar = '<XYZFILE>',
                         help = 'file containing the starting structure')
