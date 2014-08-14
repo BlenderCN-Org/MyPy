@@ -73,7 +73,7 @@ class ASEInterface():
          - output_prefix    <string>                   [Prefix for the output files]
          - nprint           <integer>                  [Print properties and xyz every nprint steps]
          - init_temperature <float>                    [Initial temperature]
-         - temperature      <float>                    [Temperature]
+         - temperature      <float>                    [Temperature - placeholder if thermostat is None]
         """
 
         # Check that everithing is right
@@ -119,7 +119,7 @@ class ASEInterface():
         the readParams method.
         """ 
 
-        msg = '#%20s --> %s\n'
+        msg = '#%20s --> %s\n' % tuple(['Params','Value'])
         for k,v in self.definedParams.items():
             msg += '%20s --> %s\n' % tuple([k,v])
 
@@ -445,7 +445,7 @@ class ASEInterface():
         time_step = self.definedParams['time_step']
         nstep = self.definedParams['nstep']
         nprint = self.definedParams['nprint']
-        
+        thermostat = self.definedParams['thermostat']
         prop_file = os.path.join(self.definedParams['workdir'],
                                  self.definedParams['output_prefix']+'.out')
         traj_file = os.path.join(self.definedParams['workdir'],
@@ -453,7 +453,12 @@ class ASEInterface():
 
         MaxwellBoltzmannDistribution(mol,init_temperature*units.kB)
 
-        dyn = dyndrivers[self.definedParams['thermostat']](mol, time_step*units.fs, temperature*units.kB, 0.01 )
+        if thermostat == 'None':
+            dyn = VelocityVerlet(mol, time_step*units.fs)
+        elif thermostat == 'Langevin':
+            dyn = Langevin(mol, time_step*units.fs, temperature*units.kB, 0.01 )
+        else:
+            raise ImplementationError(method,'Thermostat is not implemented in the MD function')
 
         #Function to print the potential, kinetic and total energy
         traj = PickleTrajectory(traj_file,"a",mol)
