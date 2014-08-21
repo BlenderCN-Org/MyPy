@@ -44,7 +44,8 @@ def __parser():
                         type=str,
                         default='dftb_std',
                         metavar = 'METHOD',
-                        choices=['dftb_std','dftb_std-D3','dftb_std-dDMC','dftb_std-D3H4'],
+                        choices=['dftb_std', 'dftb_std-D3', 'dftb_std-dDMC', 
+                                 'dftb_std-D3H4', 'dftb_mio11'],
                         help='select the method to compute the forces (default: dftb_std)')
 
     parser.add_argument('-c', '--charge',

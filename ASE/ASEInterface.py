@@ -45,7 +45,7 @@ class ASEInterface():
             - workdir  <string>   Path of where to save everithing (default = .)
         """
         
-        methods = ['dftb_std', 'dftb_std-D3', 'dftb_std-dDMC', 'dftb_std-D3H4']
+        methods = ['dftb_std', 'dftb_std-D3', 'dftb_std-dDMC', 'dftb_std-D3H4', 'dftb_mio11']
 
         # Check if file exists and if method is a valid method
         if  method not in methods:
@@ -97,6 +97,7 @@ class ASEInterface():
 
 
     def setGeomOptParams(self, output_prefix, fmax=0.001, driver='BFGSLineSearch'):
+    # def setGeomOptParams(self, output_prefix, fmax=0.001, driver='BFGS'):
         """Set the parameters needed to run a Geometry optimization.
 
         Set in order the following parameters:
@@ -160,29 +161,37 @@ class ASEInterface():
     def __setEnvironment(self):
         
         machine = self.definedParams['machine']
+        method = self.definedParams['method']
+
 
         if machine == 'workstation':
             os.environ['DFTB_COMMAND'] = '/home/petragli/data1/Software/bin/dftb+'
             os.environ['dDMC_COMMAND'] = '/home/petragli/dDMC/src/dDMC2'
             os.environ['DFTB_PREFIX'] = '/home/petragli/data2/Store/SK-parameters/3ob-1-1/'
+            if method == 'dftb_mio11':
+                os.environ['DFTB_PREFIX'] = '/home/petragli/data2/Store/SK-parameters/mio-1-1-NHorg/'
         elif machine == 'lcmdlc1':
             os.environ['DFTB_PREFIX'] = '/lcmd-data/petragli/Store/SK-parameters/3ob-1-1/'
             os.environ['DFTB_COMMAND'] = '/lcmd-data/petragli/Software/bin/dftb+'
             os.environ['dDMC_COMMAND'] = '/lcmd-data/petragli/Software/dDMC/src/dDMC2'
+            if method == 'dftb_mio11':
+                raise ImplementationError(method, 'Not implemented for this machine')
         elif machine == 'lcmdlc2':
             os.environ['DFTB_PREFIX'] = '/home/petragli/Store/SK-parameters/3ob-1-1/'
             os.environ['DFTB_COMMAND'] = '/home/petragli/Software/bin/dftb+'
             os.environ['dDMC_COMMAND'] = '/home/petragli/Software/dDMC/src/dDMC2'
             os.environ['HOME'] = '/lcmd-data/petragli'
+            if method == 'dftb_mio11':
+                raise ImplementationError(method, 'Not implemented for this machine')
         else:
             raise ImplementationError(machine, 'Enviromental variable for this machine are not implemented')
 
 
-        method = self.definedParams['method']
-
         if method == 'dftb_std-dDMC':
             pass
         elif method == 'dftb_std':
+            pass
+        elif method == 'dftb_mio11':
             pass
         elif method == 'dftb_std-D3':
             os.environ['D3'] = os.path.join(os.environ['HOME'],'Software/DFTD3/dftd3')
@@ -212,6 +221,7 @@ class ASEInterface():
     def __setDFTBParams(self):
         """Set all the parameters necessary to run teh DFTB computation."""
 
+        # 3OB parameters
         hubbard_derivs = {
             'c': -0.1492,
             'o': -0.1575,
@@ -220,6 +230,16 @@ class ASEInterface():
             's': -0.11,     # From JCTC 2013 Q. Cui
             'p': -0.14      #
         }
+        if self.definedParams['method'] == 'dftb_mio11':
+            # Mio11 parameters
+            hubbard_derivs = {
+                'c': -0.1492,
+                'o': -0.1575,
+                'n': -0.1535,
+                'h': -0.07,
+                's': -0.069,     # From JCTC 2013 Q. Cui
+                'p': -0.14      #
+            }
         max_ang_mom = {
             'c': '"p"',
             'o': '"p"',
@@ -247,7 +267,8 @@ class ASEInterface():
         self.__dftb_parameters['Hamiltonian_SCC'] = 'Yes'
         self.__dftb_parameters['Hamiltonian_ThirdOrderFull'] = 'Yes'
         self.__dftb_parameters['Hamiltonian_DampXH'] = 'Yes'
-        self.__dftb_parameters['Hamiltonian_DampXHExponent'] = 4.00
+#        self.__dftb_parameters['Hamiltonian_DampXHExponent'] = 4.00 # 3OB
+        self.__dftb_parameters['Hamiltonian_DampXHExponent'] = 4.95 # MIO11
         self.__dftb_parameters['Hamiltonian_Charge'] = float(charge)
         if spin_multiplicity > 1:
             self.__dftb_parameters['Hamiltonian_SpinPolarisation_'] = 'Colinear'
@@ -287,7 +308,7 @@ class ASEInterface():
             self.__setdDMCParams()
             from ase.calculators.dftbddmc import DftbdDMC
             self.calculator = DftbdDMC(atoms=self.mol,label='cazzo',dftbdict=self.__dftb_parameters, ddmcdict=self.__ddmc_parameters)
-        elif method == 'dftb_std':
+        elif method == 'dftb_std' or method == 'dftb_mio11':
             from ase.calculators.dftb import Dftb
             self.calculator = Dftb(atoms=self.mol,label='asd')
         elif method == 'dftb_std-D3':
@@ -411,12 +432,16 @@ class ASEInterface():
         """Geometry Optimization"""
         from ase.optimize import BFGS
         from ase.optimize.bfgslinesearch import BFGSLineSearch
+        # from ase.optimize.oldqn import GoodOldQuasiNewton
         from ase.io.trajectory import PickleTrajectory
         drivers = {
             'BFGSLineSearch' : BFGSLineSearch,
             'BFGS'           : BFGS
         }
 
+        # dyn = GoodOldQuasiNewton(self.mol, 
+        #                 trajectory=os.path.join(self.definedParams['workdir'],
+        #                 self.definedParams['output_prefix'])+'.traj')
         dyn = drivers[self.definedParams['driver']](self.mol, 
                         trajectory=os.path.join(self.definedParams['workdir'],
                         self.definedParams['output_prefix'])+'.traj')
