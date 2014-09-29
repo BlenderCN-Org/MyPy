@@ -149,11 +149,16 @@ class ASEInterface():
     def getEnvironment(self):
         """Print the contents of all the enviromental variables used by ASE in this context."""
 
+        self.__setEnvironment()
+
         env = ['DFTB_COMMAND','dDMC_COMMAND','DFTB_PREFIX','D3','D3DF','H4_correction','D3FUNC','H4']
-        
+
         msg = '%20s --> %20s\n' % tuple(['#Variable','Value'])
         for v in env:
-             msg += '%20s --> %20s\n' % tuple([v,os.environ[v]])
+            try:
+                msg += '%20s --> %20s\n' % tuple([v,os.environ[v]])
+            except:
+                msg += '%20s --> %20s\n' % tuple([v,'IS MISSING!!'])
 
         return msg
 
@@ -178,9 +183,8 @@ class ASEInterface():
                 raise ImplementationError(method, 'Not implemented for this machine')
         elif machine == 'lcmdlc2':
             os.environ['DFTB_PREFIX'] = '/home/petragli/Store/SK-parameters/3ob-1-1/'
-            os.environ['DFTB_COMMAND'] = '/home/petragli/Software/bin/dftb+'
+            os.environ['DFTB_COMMAND'] = '/home/petragli/bin/dftb+'
             os.environ['dDMC_COMMAND'] = '/home/petragli/Software/dDMC/src/dDMC2'
-            os.environ['HOME'] = '/lcmd-data/petragli'
             if method == 'dftb_mio11':
                 raise ImplementationError(method, 'Not implemented for this machine')
         else:
