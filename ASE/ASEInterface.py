@@ -151,9 +151,9 @@ class ASEInterface():
 
         env = ['DFTB_COMMAND','dDMC_COMMAND','DFTB_PREFIX','D3','D3DF','H4_correction','D3FUNC','H4']
         
-        msg = '%20 --> %20\n' % tuple(['#Variable','Value'])
+        msg = '%20s --> %20s\n' % tuple(['#Variable','Value'])
         for v in env:
-             msg += '%s --> %s\n' % tuple([v,os.environ[v]])
+             msg += '%20s --> %20s\n' % tuple([v,os.environ[v]])
 
         return msg
 
