@@ -9,7 +9,7 @@ class ASEInterface():
 
     def __init__(self, job = 'singlePoint'):
         """Define the kind of job you would like to do.
-        
+
            Possible options:
              - singlePoint
              - geomOpt
@@ -23,20 +23,20 @@ class ASEInterface():
 
     def setMachine(self, machine):
         """Set the necessary enviromental variables depending on the machine.
-        
+
         Set which computer you are using:
          - machine <string> {workstation|lcmdlc1|lcmdlc2}
         """
-        
+
         machines = ['workstation','lcmdlc1','lcmdlc2']
         if not machine in machines:
             raise InputError(machine, 'The chosen machine does not exist')
         self.definedParams['machine'] = machine
-        
+
 
     def setGeneralParams(self, method, initial_structure, charge=0, spinm=1, workdir=os.getcwd()):
         """Set the always necessary parameters.
-        
+
            Set in order the following parameters:
             - method   <string>   {dftb_std|dftb_std-D3|dftb_std-dDMC|dftb_std-D3H4}
             - xyz file <string>   Path of the xyz file
@@ -44,7 +44,7 @@ class ASEInterface():
             - spinm    <integer>  Spin Multiplicity
             - workdir  <string>   Path of where to save everithing (default = .)
         """
-        
+
         methods = ['dftb_std', 'dftb_std-D3', 'dftb_std-dDMC', 'dftb_std-D3H4', 'dftb_mio11']
 
         # Check if file exists and if method is a valid method
@@ -54,7 +54,7 @@ class ASEInterface():
         check.ifdir(workdir)
         check.ifinteger(charge, 'The charge has to be an integer')
         check.ifinteger(spinm, 'The spin multiplicity has to be an integer')
-        
+
         self.definedParams['method'] = str(method)
         self.definedParams['initial_structure'] = str(initial_structure)
         self.definedParams['workdir'] = str(workdir)
@@ -68,7 +68,7 @@ class ASEInterface():
 
         Set in order the following parameters:
          - thermostat       <string>   {Langevin|None} [If None an NVE simulation is performed]
-         - time_step        <float>                    
+         - time_step        <float>
          - nstep            <integer>                  [Number of step]
          - output_prefix    <string>                   [Prefix for the output files]
          - nprint           <integer>                  [Print properties and xyz every nprint steps]
@@ -112,13 +112,57 @@ class ASEInterface():
         self.definedParams['output_prefix'] = str(output_prefix)
         self.definedParams['driver'] = str(driver)
 
-        
+    def __xyzReader(self):
+        """Read columns other then the 4th. If those columns are present they have a meaning:
+            P -> position of the respective atom is constrained (if the atom is not constrainde you MUST specify 'f' (free))
+            float -> is the charge of the atom. All the charge MUST be specified!"""
+        import numpy as np
+        xyz = np.loadtxt(self.definedParams['initial_structure'],skiprows=2,usecols=[1,2,3])
+        atoms = np.loadtxt(self.definedParams['initial_structure'], skiprows=2,usecols=[0],dtype=str)
+        lastcolumns = []
+        try:
+            i = 4
+            while True:
+                lastcolumns.append(np.loadtxt(self.definedParams['initial_structure'], skiprows=2,usecols=[i], dtype=str))
+                i +=1
+                rewritexyz = True
+        except:
+            pass
+
+        self.__constraint = (np.zeros_like(atoms,  dtype=int) == 1).tolist()
+
+        for col in lastcolumns:
+            for tp in [float, int,  str]:
+                if isinstance(col[0], tp):
+                    col = np.array(col, dtype=tp)
+                    break
+            if np.issubdtype(col.dtype, int):
+                pass
+            elif np.issubdtype(col.dtype,  str):
+                self.__constraint = (np.array(map(lambda x: x.upper(), col)) == 'P').tolist()
+            elif np.issubdtype(col.dtype, float):
+                self.__charges = col
+
+        if rewritexyz:
+            self.definedParams['initial_structure'] = 'generated_from_ase-'+self.definedParams['initial_structure']
+            f = open(self.definedParams['initial_structure'], 'w')
+            f.write('%i\n\n' % len(atoms))
+            for atom, coord in zip(atoms, xyz):
+                f.write('%s   %12.6f   %12.6f   %12.6f\n' % (atom,  coord[0], coord[1], coord[2]))
+            f.close
+
+
+    def __applyConstraints(self):
+        from ase.constraints import FixAtoms
+        print 'Position Constrained: '+' '.join(map(lambda x: str(x), self.__constraint))
+        self.__fixedAtoms = FixAtoms(mask = self.__constraint)
+
     def getParams(self):
         """Print the value of all the parameters
-        
-        If this output is written to a file then can be reread using 
+
+        If this output is written to a file then can be reread using
         the readParams method.
-        """ 
+        """
 
         msg = '#%20s --> %s\n' % tuple(['Params','Value'])
         for k,v in self.definedParams.items():
@@ -126,11 +170,10 @@ class ASEInterface():
 
         return msg
 
-
     def readParams(self, filepath):
         """Read the parameters saved with getParams.
 
-        After readed all the parameters you can directly start the 
+        After readed all the parameters you can directly start the
         job with a call to job_start. Offcourse you need to specify
         all the needed parameters.
 
@@ -144,8 +187,8 @@ class ASEInterface():
                 if line[0] != '#':
                     k,v = line.split('-->')
                     self.definedParams[k.strip()] = v.strip()
-        
-                    
+
+
     def getEnvironment(self):
         """Print the contents of all the enviromental variables used by ASE in this context."""
 
@@ -164,7 +207,7 @@ class ASEInterface():
 
 
     def __setEnvironment(self):
-        
+
         machine = self.definedParams['machine']
         method = self.definedParams['method']
 
@@ -213,13 +256,14 @@ class ASEInterface():
 
 
     def __ASEInit(self):
-        from ase import Atoms
-        from ase.data.molecules import molecule
-        from ase.io import write, read
-        import numpy as np
-
+        # Commented because signed from the editor
+        #from ase import Atoms
+        #from ase.data.molecules import molecule
+        from ase.io import read
+        #import numpy as np
 
         self.mol = read(self.definedParams['initial_structure'])
+        self.mol.set_constraint(self.__fixedAtoms)
 
 
     def __setDFTBParams(self):
@@ -271,8 +315,9 @@ class ASEInterface():
         self.__dftb_parameters['Hamiltonian_SCC'] = 'Yes'
         self.__dftb_parameters['Hamiltonian_ThirdOrderFull'] = 'Yes'
         self.__dftb_parameters['Hamiltonian_DampXH'] = 'Yes'
-#        self.__dftb_parameters['Hamiltonian_DampXHExponent'] = 4.00 # 3OB
-        self.__dftb_parameters['Hamiltonian_DampXHExponent'] = 4.95 # MIO11
+        self.__dftb_parameters['Hamiltonian_DampXHExponent'] = 4.00 # 3OB
+        if self.definedParams['method'] == 'dftb_mio11':
+            self.__dftb_parameters['Hamiltonian_DampXHExponent'] = 4.95 # MIO11
         self.__dftb_parameters['Hamiltonian_Charge'] = float(charge)
         if spin_multiplicity > 1:
             self.__dftb_parameters['Hamiltonian_SpinPolarisation_'] = 'Colinear'
@@ -354,7 +399,7 @@ class ASEInterface():
         Calculates all forces by default."""
 
         import numpy as np
-        from ase.parallel import world, rank, distribute_cpus
+        from ase.parallel import world, distribute_cpus
         from ase.utils import opencew
 
         indices = range(len(atoms))
@@ -407,6 +452,7 @@ class ASEInterface():
                 fan = ['-', '\\', '|', '/']
                 sys.stderr.write("\r[%-100s]%3.1f%% %1s" % tuple([int(float(counter)/float(total_calculation)*100)*'=',float(counter)/float(total_calculation)*100,fan[counter%4]]))
                 sys.stderr.flush()
+        sys.stderr.write('\n')
         if parallel is not None:
             world.sum(F_ai)
         return F_ai
@@ -422,13 +468,13 @@ class ASEInterface():
     def compareForces(self):
         """Compare forces.
 
-        Return the forces computed numerically 
+        Return the forces computed numerically
         and analitically with the same method."""
         energy = self.mol.get_potential_energy()
         anal = self.mol.get_forces()
         numer =  self.numeric_forces(self.mol, axes=(0, 1, 2), d=0.001,
                        parallel=None, name=None)
-        
+
         return anal, numer
 
 
@@ -437,19 +483,21 @@ class ASEInterface():
         from ase.optimize import BFGS
         from ase.optimize.bfgslinesearch import BFGSLineSearch
         # from ase.optimize.oldqn import GoodOldQuasiNewton
-        from ase.io.trajectory import PickleTrajectory
+        #from ase.io.trajectory import PickleTrajectory
         drivers = {
             'BFGSLineSearch' : BFGSLineSearch,
             'BFGS'           : BFGS
         }
 
-        # dyn = GoodOldQuasiNewton(self.mol, 
+        # dyn = GoodOldQuasiNewton(self.mol,
         #                 trajectory=os.path.join(self.definedParams['workdir'],
         #                 self.definedParams['output_prefix'])+'.traj')
-        dyn = drivers[self.definedParams['driver']](self.mol, 
+
+        dyn = drivers[self.definedParams['driver']](self.mol,
                         trajectory=os.path.join(self.definedParams['workdir'],
                         self.definedParams['output_prefix'])+'.traj')
         dyn.run(fmax=self.definedParams['fmax'])
+        return 'done'
 
 
     def MD(self):
@@ -496,11 +544,13 @@ class ASEInterface():
 
         dyn.run(nstep)
         traj.close()
-       
+
 
     # Run the computation:
     def __initCalc(self):
         """Set everething!."""
+        self.__xyzReader()
+        self.__applyConstraints()
         self.__setEnvironment()
         self.__ASEInit()
         self.__setDFTBParams()
@@ -517,7 +567,7 @@ class ASEInterface():
             'compareForces': self.compareForces,
             'MD'           : self.MD
         }
-         
+
         job = self.definedParams['job']
         return jobs[job]()
 
@@ -526,7 +576,7 @@ class ASEInterface():
 if __name__ == '__main__':
 
     asd = ASEInterface()
-    
+
     asd.setMachine('workstation')
     asd.setGeneralParams('dftb_std-dDMC','c6.xyz')
     # asd.setGeomOptParams('testout',)
