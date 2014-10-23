@@ -28,6 +28,8 @@ def __setHostname():
 
     if hostname == 'icmbpriv20':
         return 'workstation'
+    elif hostname == 'lcmdlc1':
+        return 'lcmdlc1'
     else:
         raise ImplementationError(hostname,'Hostname not defined in __setHostname')
 
