@@ -117,6 +117,7 @@ class ASEInterface():
             P -> position of the respective atom is constrained (if the atom is not constrainde you MUST specify 'f' (free))
             float -> is the charge of the atom. All the charge MUST be specified!"""
         import numpy as np
+        rewritexyz = False
         xyz = np.loadtxt(self.definedParams['initial_structure'],skiprows=2,usecols=[1,2,3])
         atoms = np.loadtxt(self.definedParams['initial_structure'], skiprows=2,usecols=[0],dtype=str)
         lastcolumns = []
