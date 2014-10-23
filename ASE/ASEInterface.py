@@ -155,9 +155,15 @@ class ASEInterface():
 
     def __applyConstraints(self):
         from ase.constraints import FixAtoms
+<<<<<<< HEAD
         if any(self.__constraint):
             print 'Position Constrained: '+' '.join(map(lambda x: str(x), self.__constraint))
         self.__fixedAtoms = FixAtoms(mask = self.__constraint)
+=======
+        if not any(self.__constraint):
+            print 'Position Constrained: '+' '.join(map(lambda x: str(x), self.__constraint))
+            self.__fixedAtoms = FixAtoms(mask = self.__constraint)
+>>>>>>> 024e04470e2f616ac4b72704507ff58d3bc902b6
 
     def getParams(self):
         """Print the value of all the parameters
