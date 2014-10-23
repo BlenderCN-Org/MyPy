@@ -12,22 +12,21 @@ def main():
     voisins = frg.neighbours(atomnos, atomcoords)
     monomers = frg.molsplit(voisins)
     
+    i = 0
     for m in monomers.keys():
         monomer = []
         for atom in monomers[m]:
             monomer.append([atomnos[atom]]+atomcoords[atom])
         fname = '%s_mono%i.xyz'%(args.out_prefix, m+1)
-#        writexyz(fname, monomer, cstring)
+        #        writexyz(fname, monomer, cstring)
+        print 'Mon %i molecular mass: %12.6f' % tuple([i,frg.molecular_mass(monomers[i],atomnos)])
+        i += 1
 
-    print "Mon 1 molecular mass: ",frg.molecular_mass(monomers[0],atomnos)
-    print "Mon 2 molecular mass: ",frg.molecular_mass(monomers[1],atomnos)
+    # print "Mon 1 molecular mass: ",
+    # print "Mon 2 molecular mass: ",frg.molecular_mass(monomers[1],atomnos)
 
-    print "Mon 1: ", sorted(monomers[0])
-    print "Mon 2: ", sorted(monomers[1])
-    
-    mon1_b = frg.baricenter(monomers[0],atomnos,atomcoords)
-    mon2_b = frg.baricenter(monomers[1],atomnos,atomcoords)
-    print 'Monomer Distance: %12.4f' % np.linalg.norm(mon1_b - mon2_b)
+    # print "Mon 1: ", sorted(monomers[0])
+    # print "Mon 2: ", sorted(monomers[1])
 
     for a in monomers.keys():
         outfn = args.out_prefix+str(a)+'.xyz'
