@@ -12,6 +12,7 @@ def main():
     args = __parser()
 
     ase = ASEInterface(job=args.job)
+
     ase.setMachine(__setHostname())
     ase.setGeneralParams(args.method, args.xyzfile, charge = args.charge,
                          spinm = args.spinm)
@@ -24,11 +25,14 @@ def main():
 
 def __setHostname():
     import socket
+    import re
     hostname = socket.gethostname()
 
+    reg = re.compile(r'^lcmd(\d|\w{2})\d$')
+    
     if hostname == 'icmbpriv20':
         return 'workstation'
-    elif hostname == 'lcmdlc1':
+    elif reg.match(hostname):
         return 'lcmdlc1'
     else:
         raise ImplementationError(hostname,'Hostname not defined in __setHostname')
@@ -78,6 +82,7 @@ def __parser():
                         default = 'singlePoint',
                         choices = ['singlePoint', 'geomOpt']
                         )
+
 
     return parser.parse_args()
     # (options, args) = parser.parse_args(sys.argv[:])
