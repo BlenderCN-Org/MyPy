@@ -218,12 +218,16 @@ class ASEInterface():
             os.environ['DFTB_COMMAND'] = '/home/petragli/data1/Software/bin/dftb+'
             os.environ['dDMC_COMMAND'] = '/home/petragli/dDMC/src/dDMC2'
             os.environ['DFTB_PREFIX'] = '/home/petragli/data2/Store/SK-parameters/3ob-1-1/'
+            os.environ['D3'] = os.path.join(os.environ['HOME'],'Software/DFTD3/dftd3')
+            os.environ['H4'] = os.path.join(os.environ['HOME'],'Software/H_BONDS4/h_bonds4.DFTB')
             if method == 'dftb_mio11':
                 os.environ['DFTB_PREFIX'] = '/home/petragli/data2/Store/SK-parameters/mio-1-1-NHorg/'
         elif machine == 'lcmdlc1':
             os.environ['DFTB_PREFIX'] = '/lcmd-data/petragli/Store/SK-parameters/3ob-1-1/'
             os.environ['DFTB_COMMAND'] = '/lcmd-data/petragli/Software/bin/dftb+'
             os.environ['dDMC_COMMAND'] = '/lcmd-data/petragli/Software/dDMC/src/dDMC2'
+            os.environ['D3'] = os.path.join(os.environ['HOME'],'lcmd-data/Software/DFTD3/dftd3')
+            os.environ['H4'] = os.path.join(os.environ['HOME'],'lcmd-data/Software/H_BONDS4/h_bonds4.DFTB')
             if method == 'dftb_mio11':
                 raise ImplementationError(method, 'Not implemented for this machine')
         elif machine == 'lcmdlc2':
@@ -243,16 +247,12 @@ class ASEInterface():
         elif method == 'dftb_mio11':
             pass
         elif method == 'dftb_std-D3':
-            os.environ['D3'] = os.path.join(os.environ['HOME'],'Software/DFTD3/dftd3')
             os.environ['D3DF'] = 'zero'
             os.environ['H4_correction']='no'
             os.environ['D3FUNC'] = 'scc-dftb+h4'
-            os.environ['H4'] = os.path.join(os.environ['HOME'],'Software/H_BONDS4/h_bonds4.DFTB')
         elif method == 'dftb_std-D3H4':
-            os.environ['D3'] = os.path.join(os.environ['HOME'],'Software/DFTD3/dftd3')
             os.environ['D3DF'] = 'zero'
             os.environ['D3FUNC'] = 'scc-dftb+h4'
-            os.environ['H4'] = os.path.join(os.environ['HOME'],'Software/H_BONDS4/h_bonds4.DFTB')
         else:
             raise ImplementationError(method,'Enviromental variables for this method are not implemented')
 
