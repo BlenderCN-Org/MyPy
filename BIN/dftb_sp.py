@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """Using the ASEInterface to run a geometry optimization.
 
    This script works directly from command line, so use the
