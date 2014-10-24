@@ -225,7 +225,7 @@ class ASEInterface():
         elif machine == 'lcmdlc1':
             os.environ['DFTB_PREFIX'] = '/lcmd-data/petragli/Store/SK-parameters/3ob-1-1/'
             os.environ['DFTB_COMMAND'] = '/lcmd-data/petragli/Software/bin/dftb+'
-            os.environ['dDMC_COMMAND'] = '/lcmd-data/petragli/Software/dDMC/src/dDMC2'
+            os.environ['dDMC_COMMAND'] = '/lcmd-data/petragli/MyCodes/dDMC/src/dDMC2'
             os.environ['D3'] = os.path.join(os.environ['HOME'],'lcmd-data/Software/DFTD3/dftd3')
             os.environ['H4'] = os.path.join(os.environ['HOME'],'lcmd-data/Software/H_BONDS4/h_bonds4.DFTB')
             if method == 'dftb_mio11':
