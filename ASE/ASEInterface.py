@@ -96,8 +96,8 @@ class ASEInterface():
         self.definedParams['nprint']            = int(nprint)
 
 
-    def setGeomOptParams(self, output_prefix, fmax=0.001, driver='BFGSLineSearch'):
-    # def setGeomOptParams(self, output_prefix, fmax=0.001, driver='BFGS'):
+    # def setGeomOptParams(self, output_prefix, fmax=0.001, driver='BFGSLineSearch'):
+    def setGeomOptParams(self, output_prefix, fmax=0.001, driver='BFGS'):
         """Set the parameters needed to run a Geometry optimization.
 
         Set in order the following parameters:
