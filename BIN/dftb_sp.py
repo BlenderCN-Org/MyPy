@@ -5,6 +5,9 @@
    --help option to see the help."""
 
 from MyPy.ERRORS.errors_handling import *
+import sys
+import os
+import shutil
 
 
 def main():
@@ -19,6 +22,18 @@ def main():
     ase.setGeomOptParams('out')
 
     ase.getParams()
+
+    wd = str(args.xyzfile)[:-4]+'-'+str(args.job)+'-'+str(args.method)
+    print wd
+    try:
+        os.mkdir(wd)
+        shutil.copy(str(args.xyzfile), wd)
+        os.chdir(wd)
+        print 'DIR', os.getcwd()
+    except:
+       sys.stderr.write('Problem creating the directory: %s\n' % wd )
+       sys.exit(1)
+    
     print ase.runJob()
 
 
