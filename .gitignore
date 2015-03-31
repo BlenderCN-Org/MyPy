@@ -1,2 +1,6 @@
 *.pyc
 *~
+pdf/
+MD/test/
+BIN/test/
+MD/drift_noddmc/

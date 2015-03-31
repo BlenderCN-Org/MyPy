@@ -2,6 +2,9 @@
 
 import numpy as np
 import os
+import sys
+
+sys.path.append('/home/petragli/MyCodes')
 
 class meanPlane:
     
@@ -92,12 +95,18 @@ class mdxyz():
                     continue
             
     def add_atom(self,at_type,at_xyz):
+        """ Add an atom to each frame. 
+
+        add_atom(at_type, at_xyz)
+
+        where at_xyz has to be a list of a 3 coordinate. There has to be 
+        a 3-coordinate list for every frame in the xyz"""
         import re
         match = re.match('^[a-zA-Z][a-zA-Z]$',at_type)
         
         if type(at_type) != str or type(at_xyz) != list:
-            print type(at_type),type(at_xyz)
             print "The atom type has to be a string and the atom coordinates has to be a list"
+            print "atom type:", type(at_type), "   coordinates:",type(at_xyz)
             import sys
             sys.exit()
 
@@ -116,8 +125,9 @@ class mdxyz():
         self.at_type.insert(0,at_type)
 
         for i in xrange(self.frames):
+#            print at_xyz[i]
             try:
-                xyz = at_xyz(i)
+                xyz = at_xyz[i]
             except:
                 xyz = at_xyz[-1]
 
@@ -141,6 +151,7 @@ class mdxyz():
     def _checklist(self,string):
         import re
 
+#        print string
         match = re.match('^(\d+)\-(\d+)$',string)
         if match:
             start_index = int(match.group(1))-1
@@ -158,7 +169,7 @@ class mdxyz():
         
         atoms = []
         at_list = n.split(',')
-        
+
         for elem in at_list:
             
             start_id, end_id = self._checklist(elem)
@@ -195,11 +206,10 @@ class mdxyz():
         
         import MyPy.DATA.atomdata
         atdata = MyPy.DATA.atomdata.atomdata()
-
+        
         op_mode = 'a'
         if not append or not os.path.exists(filepath): op_mode = 'w'
         atoms = self.atom(n,frame=frame)
-#        print atoms
         with open(filepath,op_mode) as fxyz:
             fxyz.write(' %10i \n\n' % len(atoms))
             for at in atoms:

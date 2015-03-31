@@ -45,7 +45,7 @@ class ASEInterface():
             - workdir  <string>   Path of where to save everithing (default = .)
         """
 
-        methods = ['dftb_std', 'dftb_std-D3', 'dftb_std-dDMC', 'dftb_std-D3H4', 'dftb_mio11']
+        methods = ['dftb_std', 'dftb_std-D3', 'dftb_std-dDMC', 'dftb_std-D3H4', 'dftb_mio11', 'dDMC']
 
         # Check if file exists and if method is a valid method
         if  method not in methods:
@@ -242,6 +242,8 @@ class ASEInterface():
 
         if method == 'dftb_std-dDMC':
             pass
+        elif method == 'dDMC':
+            pass
         elif method == 'dftb_std':
             pass
         elif method == 'dftb_mio11':
@@ -361,18 +363,24 @@ class ASEInterface():
             self.calculator = DftbdDMC(atoms=self.mol,label='cazzo',dftbdict=self.__dftb_parameters, ddmcdict=self.__ddmc_parameters)
         elif method == 'dftb_std' or method == 'dftb_mio11':
             from ase.calculators.dftb import Dftb
-            self.calculator = Dftb(atoms=self.mol,label='asd')
+            self.calculator = Dftb(atoms=self.mol,label='cazzo')
         elif method == 'dftb_std-D3':
             from ase.calculators.dftbd3h4 import DftbD3H4
             self.calculator = DftbD3H4(atoms=self.mol,label='cazzo',dftbdict=self.__dftb_parameters )
         elif method == 'dftb_std-D3H4':
             from ase.calculators.dftbd3h4 import DftbD3H4
             self.calculator = DftbD3H4(atoms=self.mol,label='cazzo',dftbdict=self.__dftb_parameters )
+        elif method == 'dDMC':
+            self.__setdDMCParams()
+            from ase.calculators.ddmc import dDMC
+            self.calculator = dDMC(atoms=self.mol, label='cazzo')
         else:
             raise ImplementationError(method,'Calculator for this method is not implemented')
 
-        self.calculator.parameters.update(self.__dftb_parameters)
-
+        if self.definedParams['method'].find('dftb') > -1:
+            self.calculator.parameters.update(self.__dftb_parameters)
+        else:
+            self.calculator.parameters.update(self.__ddmc_parameters)
 
     # Compute the numerical Derivative!
     def __numeric_force(self,atoms, a, i, d=0.001):
@@ -555,7 +563,8 @@ class ASEInterface():
         self.__applyConstraints()
         self.__setEnvironment()
         self.__ASEInit()
-        self.__setDFTBParams()
+        if self.definedParams['method'].find('dftb') > -1:
+            self.__setDFTBParams()
         self.__setASECalculator()
 
     def runJob(self):
